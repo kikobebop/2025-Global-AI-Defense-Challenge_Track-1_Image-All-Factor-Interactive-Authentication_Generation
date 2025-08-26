@@ -1,0 +1,102 @@
+# =========================================================
+# 用途：
+#   - 被 code/vttie/generate.py 调用执行 VTTIE（视觉文字编辑）批量生成
+#   - 被 code/vttie/score_vttie.py 调用进行自动化打分
+# 说明：
+#   - seeds 可为单个 int 或 int 列表；当 num_candidates > seeds 数量时，
+#     将按 seeds[0] + i 自动补齐，保证生成可复现。
+#   - backend 支持 Qwen-Image-Edit 或 FLUX.1-Kontext-dev。
+#   - 输出结构与 T2I/TIE 模块一致（包含 candidates.csv / failures.csv）。
+# 快速使用：
+#   1) 修改 data.task_csv / data.img_root 为你的数据路径；
+#   2) 选择 pipeline.backend（qwen_edit 或 flux_edit）并设置对应 backend_params；
+#   3) 调整 seeds / num_candidates / steps 等参数；
+#   4) 运行：python code/vttie/generate.py -c configs/vttie.yaml
+#   5) （可选）评分：python code/vttie/score_vttie.py -c configs/vttie.yaml
+#
+# Overview
+# Purpose:
+#   - Used by code/vttie/generate.py to run VTTIE (vision+text instructed editing) in batch
+#   - Used by code/vttie/score_vttie.py for automated scoring
+# Notes:
+#   - seeds can be an int or a list of ints; if num_candidates > len(seeds),
+#     seeds are auto-extended by seeds[0] + i to keep runs reproducible.
+#   - Backends: Qwen-Image-Edit or FLUX.1-Kontext-dev.
+#   - Output layout matches T2I/TIE (with candidates.csv / failures.csv).
+#
+# Quick Start:
+#   1) Edit data.task_csv / data.img_root to point to your dataset paths;
+#   2) Select pipeline.backend (qwen_edit or flux_edit) and configure backend_params;
+#   3) Adjust seeds / num_candidates / steps as needed;
+#   4) Run generation: python code/vttie/generate.py -c configs/vttie.yaml
+#   5) (Optional) Run scoring: python code/vttie/score_vttie.py -c configs/vttie.yaml
+# =========================================================
+
+run:
+  name: vttie_qwen_aug           # run name used as output dir prefix
+
+pipeline:
+  backend: qwen_edit             # options: flux_edit / qwen_edit
+  dtype: bf16                    # inference precision: bf16 / fp16
+  num_candidates: 1              # number of edited candidates per task
+  seeds: [24]                    # seeds for reproducibility; int or list
+
+output:
+  dir: /***/code_cleanup/results/vttie  # output root directory (masked)
+
+data:
+  task_csv: /***/code_cleanup/data/task.csv
+  img_root: /***/code_cleanup/data/imgs  # root folder for original images
+  filter_task_types: ["vttie"]           # only process vttie tasks
+  index_max: 511                         # process samples with index < 511
+
+backend_params:
+  qwen_edit:
+    model_path: /***/models/Qwen-Image-Edit
+    steps: 50
+    true_cfg: 4.0
+    negative_prompt: ""
+    augment:
+      enable: true
+      negative_common: >
+        do not change background; do not change people; do not change objects;
+        no global restyle; no color shift; no relighting; no smoothing;
+        do not modify any other text; keep original layout; keep font; keep stroke; keep size;
+        no deformation; no warping; no overpainting; no artifacts
+
+  flux_edit:
+    model_path: /***/models/FLUX.1-Kontext-dev
+    steps: 28
+    guidance_scale: 3.2
+    negative_prompt: ""
+    augment:
+      enable: true
+      mode: strict
+      presets:
+        lite:
+          suffix_en: ", keep unchanged areas intact, preserve composition and subject identity, seamless edit, consistent lighting and color, clean edges"
+          negative_en: "artifacts, seams, ghosting, distortion, blur, low-res, text, watermark, color shift, over-smoothing, over-sharpening"
+        balanced:
+          suffix_en: "preserve composition and subject identity, match the overall image style, seamless integration, consistent lighting and color balance, realistic shadows, clean edges"
+          negative_en: "blurry, low-res, artifacts, text, watermark, editing seams, ghosting, warped shapes, mismatched perspective, color shift, over-smoothing, over-sharpening"
+        strict:
+          suffix_en: ", strictly preserve overall composition and subject identity, keep all other regions unchanged, match the overall image style, no layout drift, match perspective and scale, consistent lighting and color, seamless boundaries"
+          negative_en: "blurry, low-res, jpeg artifacts, text, watermark, editing seams, ghosting, duplicated or floating objects, warped shapes, mismatched perspective, color shift, chromatic aberration, over-smoothing, over-sharpening"
+
+logging:
+  save_candidates_csv: true
+  save_failures_csv: true
+
+scoring:
+  enable: true
+  model_id: /***/models/Qwen2.5-VL-72B-Instruct
+  max_new_tokens: 256
+  do_sample: false
+
+  input:
+    run_dir: /***/code_cleanup/results/vttie/<backend>_<timestamp>
+
+  # Optional override for data.task_csv
+  # task_csv: /***/code_cleanup/data/task.csv
+  # Optional: default writes scores.csv into run_dir if not set
+  # out_csv: /***/results/vttie/<backend>_<timestamp>/scores.csv

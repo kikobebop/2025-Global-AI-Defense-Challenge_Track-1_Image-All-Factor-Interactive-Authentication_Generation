@@ -1,0 +1,118 @@
+# configs/t2i.yaml
+# =========================================================
+# 中文简介
+# 用途：
+#   - 由 code/t2i/generate.py 调用进行批量 T2I 生成
+#   - （可选）由 code/t2i/score_t2i.py 调用进行自动化评分
+#   - （可选）由 code/t2i/sr_t2i.py 调用进行超分后处理
+# 约定：
+#   - seeds 可为单个整数或整数列表；当 num_candidates > seeds 个数时，
+#     会自动按 seeds[0] + i 生成补齐种子，确保结果可复现
+#   - aspect_ratio 仅在未显式设置 width/height 时生效，具体映射见 generate.py 中 AR_SIZES
+# 输出：
+#   - 生成目录：output.dir 下，以 run.name + 时间戳 自动生成子目录
+#   - 配置快照：config_resolved.json（完整配置及运行信息）
+#   - 元数据：candidates.csv（记录 index、candidate_id、seed、参数等信息）
+#
+# 快速使用：
+#   1) 修改 pipeline.backend 选择 'sdxl' 或 'qwen_image'
+#   2) 调整 pipeline.num_candidates 和 seeds 控制候选数量与随机性
+#   3) 设置 data.task_csv 和 output.dir 为输入任务表和输出路径
+#   4) 生成图片： python code/t2i/generate.py --config configs/t2i.yaml
+#   5) 自动评分： python code/t2i/score_t2i.py --config configs/t2i.yaml
+#   6) 超分处理： python code/t2i/sr_t2i.py --config configs/t2i.yaml
+#
+# English Description
+# Purpose:
+#   - Used by code/t2i/generate.py for batch T2I generation
+#   - (Optional) Used by code/t2i/score_t2i.py for automated scoring
+#   - (Optional) Used by code/t2i/sr_t2i.py for ESRGAN super-resolution postprocess
+# Conventions:
+#   - seeds can be a single int or a list; if num_candidates > len(seeds),
+#     seeds[0] + i will be auto-generated to guarantee reproducibility
+#   - aspect_ratio is only applied when width/height is not explicitly set
+# Outputs:
+#   - Generated directory: subfolder under output.dir with run.name + timestamp
+#   - Snapshot: config_resolved.json (expanded config with runtime info)
+#   - Metadata: candidates.csv (records index, candidate_id, seed, and params)
+#
+# Quick Usage:
+#   1) Set pipeline.backend to 'sdxl' or 'qwen_image'
+#   2) Adjust pipeline.num_candidates and seeds for candidate count and reproducibility
+#   3) Update data.task_csv and output.dir for task input and output folder
+#   4) Generate images: python code/t2i/generate.py --config configs/t2i.yaml
+#   5) Run automated scoring: python code/t2i/score_t2i.py --config configs/t2i.yaml
+#   6) Apply super-resolution: python code/t2i/sr_t2i.py --config configs/t2i.yaml
+# =========================================================
+
+run:
+  name: t2i_sdxl_aug  # Prefix for this run; used for output folder naming
+
+pipeline:
+  backend: sdxl       # Options: 'sdxl' or 'qwen_image'
+  dtype: bf16         # Inference precision: bf16 or fp16
+  num_candidates: 2   # Number of candidates per task
+  seeds: [8, 24]      # Seed(s) for reproducibility
+
+output:
+  dir: /***/results/t2i  # Output root directory
+
+data:
+  task_csv: /***/data/task.csv
+  filter_task_types: ["t2i"]  # Process only these task types
+  index_max: 3                # Only process indices < index_max for quick tests
+
+backend_params:
+  qwen_image:
+    model_path: /***/models/Qwen-Image-20B
+    aspect_ratio: "16:9"      # Will map to specific size if width/height not given
+    steps: 50                 # Sampling steps
+    true_cfg: 4.0             # Qwen-Image-specific CFG parameter
+    negative_prompt: ""       # Keep empty to leverage true CFG's negative guidance
+    augment:
+      enable: true
+      suffix_en: ", rich details, cinematic lighting and composition, natural color grading, realistic textures, balanced exposure, soft shadows, good micro-contrast"
+      suffix_cn: "，细节丰富，电影感灯光及构图，色彩自然，真实材质，曝光均衡，柔和阴影，微对比增强"
+      negative_en: "blurry, out of focus, low-res, jpeg artifacts, text, watermark, color banding, oversharpen, overexposed, underexposed, excessive noise, chromatic aberration, deformed face, wrongly-shaped eyes, asymmetrical face, waxy skin, bad anatomy, extra fingers, fused fingers, missing fingers, disfigured hands, extra limbs"
+      negative_cn: "模糊，失焦，低清晰度，压缩伪影，文字水印，色带，过度锐化，过曝，欠曝，噪点过多，色散，面部畸形，眼部异常，面部不对称，蜡质皮肤，解剖错误，多手指，手指粘连，缺失手指，手部畸形，多余肢体"
+
+  sdxl:
+    model_path_base: /***/models/SDXL-base-1.0
+    model_path_refiner: /***/models/SDXL-refiner-1.0
+    use_refiner: true
+    width: 1024
+    height: 1024
+    total_steps: 80
+    guidance_scale: 6.5
+    high_noise_frac: 0.76
+    augment:
+      enable: true
+      suffix_en: ", rich details, cinematic lighting and composition, natural color grading, realistic textures, balanced exposure, soft shadows, good micro-contrast"
+      suffix_cn: "，细节丰富，电影感灯光及构图，色彩自然，真实材质，曝光均衡，柔和阴影，微对比增强"
+      negative_en: "blurry, out of focus, low-res, jpeg artifacts, text, watermark, color banding, oversharpen, overexposed, underexposed, excessive noise, chromatic aberration, deformed face, wrongly-shaped eyes, asymmetrical face, waxy skin, bad anatomy, extra fingers, fused fingers, missing fingers, disfigured hands, extra limbs"
+      negative_cn: "模糊，失焦，低清晰度，压缩伪影，文字水印，色带，过度锐化，过曝，欠曝，噪点过多，色散，面部畸形，眼部异常，面部不对称，蜡质皮肤，解剖错误，多手指，手指粘连，缺失手指，手部畸形，多余肢体"
+
+logging:
+  save_candidates_csv: true   # Save metadata of successful generations
+  save_failures_csv: true     # Save metadata of failed generations
+
+scoring:
+  enable: true
+  model_id: /***/models/Qwen2.5-VL-72B-Instruct
+  max_new_tokens: 256
+  do_sample: false
+  input:
+    run_dir: /***/results/t2i/<backend>_<timestamp>
+
+postprocess:
+  esrgan:
+    enable: true
+    scale: 2                  # Default ESRGAN upscale factor (e.g., 2x or 4x)
+    respect_prompt: true      # If true, align to 4K/8K resolution if prompt mentions
+    target_long_4k: 3840
+    target_long_8k: 7680
+    input:
+      dir: /***/results/t2i/<backend>_<timestamp>/
+    weights: /***/weights/RealESRGAN_x4plus.pth
+    tile: 0
+    tile_pad: 10

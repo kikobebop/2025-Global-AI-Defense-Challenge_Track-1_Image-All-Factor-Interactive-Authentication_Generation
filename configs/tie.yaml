@@ -1,0 +1,116 @@
+# configs/tie.yaml
+# =========================================================
+# 简介
+# 用途：
+#   - 被 code/tie/generate.py 调用以批量执行 TIE（文本指令图像编辑）
+#   - （可选）被 code/tie/score_tie.py 调用进行自动化打分
+# 约定：
+#   - seeds 可为单个 int 或 int 列表；当 num_candidates > seeds 个数时，
+#     按 seeds[0] + i 自动补齐，保证可复现。
+#   - backend 支持：qwen_edit（Qwen-Image-Edit）或 flux_edit（FLUX.1-Kontext-dev）。
+#   - 输出目录结构与文件（candidates.csv / failures.csv）与 T2I 模块保持一致。
+# 快速使用：
+#   1) 修改 data.task_csv / data.img_root 为你的数据路径；
+#   2) 选择 pipeline.backend（qwen_edit 或 flux_edit）并设置对应 backend_params；
+#   3) 调整 seeds / num_candidates / steps 等参数；
+#   4) 运行：python code/tie/generate.py -c configs/tie.yaml
+#   5) （可选）评分：python code/tie/score_tie.py -c configs/tie.yaml
+#
+# Overview
+# Purpose:
+#   - Used by code/tie/generate.py for batch Text-Instructed Image Editing (TIE)
+#   - (Optional) Used by code/tie/score_tie.py for automatic evaluation
+# Conventions:
+#   - `seeds` can be an int or a list; if `num_candidates` exceeds the list size,
+#     seeds are extended by `seeds[0] + i` for reproducibility.
+#   - Backends: `qwen_edit` (Qwen-Image-Edit) or `flux_edit` (FLUX.1-Kontext-dev).
+#   - Output folder layout and CSV files (candidates.csv / failures.csv) match the T2I module.
+# Quick guide:
+#   1) Point `data.task_csv` / `data.img_root` to your data;
+#   2) Pick `pipeline.backend` (qwen_edit or flux_edit) and set related `backend_params`;
+#   3) Tune seeds / num_candidates / steps;
+#   4) Run:    python code/tie/generate.py -c configs/tie.yaml
+#   5) Score:  python code/tie/score_tie.py -c configs/tie.yaml
+# =========================================================
+
+run:
+  # run name only affects output folder naming
+  # name: tie_flux_baseline
+  # name: tie_flux_aug
+  # name: tie_qwen_baseline
+  name: tie_qwen_aug
+
+pipeline:
+  backend: qwen_edit          # qwen_edit | flux_edit
+  dtype: bf16                 # bf16/fp16; hardware dependent
+  num_candidates: 1           # candidates per task
+  # num_candidates: 2
+  # seeds: [0]
+  # seeds: [3, 824]
+  # seeds: [24]
+  seeds: [824]                # single int or list; auto-extended if needed
+
+output:
+  dir: /****/aigc_competition/code_cleanup/results/tie   # output root
+
+data:
+  # task_csv must contain:
+  # index, task_type(="tie"), prompt(instruction), ori_image(path to source image)
+  task_csv: /****/aigc_competition/code_cleanup/data/task.csv
+  # task_csv: /****/aigc_competition/code_cleanup/data/task_en.csv
+  img_root: /****/aigc_competition/code_cleanup/data/imgs  # source image folder
+  filter_task_types: ["tie"]   # only process 'tie'
+  index_max: 261               # process rows with index < 261
+
+backend_params:
+  qwen_edit:
+    model_path: /****/aigc_competition/models/Qwen-Image-Edit
+    steps: 50
+    true_cfg: 4.0
+    negative_prompt: ""        # keep empty for baseline; use augment.negative_cn for constraints
+    augment:                   # optional prompt strengthening (Chinese-focused with concise negatives)
+      enable: true
+      prefix_cn: "请严格依据以下指令进行图像编辑：在不影响无关区域的前提下，只对与指令相关的元素进行必要的修改；保持主体、背景、构图与色调稳定，不进行不必要的全局风格变化；新增/删除内容仅在指令明确要求时执行；人像编辑需保持五官结构自然，避免过度磨皮与失真；文本（如有）非编辑目标时保持清晰不变；若指令明确要求整体风格迁移或大幅重绘，则以该要求为准。"
+      negative_cn: "avoid unnecessary global restyle; no unintended color shift; no relighting; do not modify unrelated regions; do not add or remove unrelated objects; no warping; no distortion; keep composition and background stable; no plastic/waxy skin; avoid over-smoothing; preserve non-target text integrity"
+
+  flux_edit:
+    model_path: /****/aigc_competition/models/FLUX.1-Kontext-dev
+    steps: 32
+    guidance_scale: 2.5
+    negative_prompt: ""        # keep empty for baseline; overridden by presets in augment mode
+    augment:
+      enable: true
+      # presets: lite / balanced / strict
+      mode: balanced
+      presets:
+        lite:
+          suffix_en: ", keep unchanged areas intact, preserve composition and subject identity, seamless edit, consistent lighting and color, clean edges"
+          negative_en: "artifacts, seams, ghosting, distortion, blur, low-res, text, watermark, color shift, over-smoothing, over-sharpening"
+        balanced:
+          suffix_en: "preserve composition and subject identity, match the overall image style, seamless integration, consistent lighting and color balance, realistic shadows, clean edges"
+          negative_en: "blurry, low-res, artifacts, text, watermark, editing seams, ghosting, warped shapes, mismatched perspective, color shift, over-smoothing, over-sharpening"
+        strict:
+          suffix_en: ", strictly preserve overall composition and subject identity, keep all other regions unchanged, match the overall image style, no layout drift, match perspective and scale, consistent lighting and color, seamless boundaries"
+          negative_en: "blurry, low-res, jpeg artifacts, text, watermark, editing seams, ghosting, duplicated or floating objects, warped shapes, mismatched perspective, color shift, chromatic aberration, over-smoothing, over-sharpening"
+
+logging:
+  save_candidates_csv: true    # write candidates.csv for all successful edits
+  save_failures_csv: true      # write failures.csv for failed rows (with error messages)
+
+scoring:
+  enable: true
+  model_id: /****/aigc_competition/models/Qwen2.5-VL-72B-Instruct
+  max_new_tokens: 256
+  do_sample: false             # deterministic scoring
+
+  input:
+    # Preferred: give run_dir; script will read run_dir/candidates.csv
+    run_dir: /****/code_cleanup/results/tie/<backend>_<timestamp>
+    # Or specify candidates.csv directly:
+    # candidates_csv: /****/results/tie/<backend>_<timestamp>/candidates.csv
+
+  # Optional: override data.task_csv if needed
+  # task_csv: /****/aigc_competition/code_cleanup/data/task.csv
+
+  # Optional: by default writes to <run_dir>/scores.csv
+  # out_csv: /****/results/tie/<backend>_<timestamp>/scores.csv

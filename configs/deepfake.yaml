@@ -1,0 +1,122 @@
+# configs/deepfake.yaml
+# =========================================================
+# 用途：
+#   - Deepfake/换脸任务的批量生成与记录。
+#   - 后端使用 InsightFace InSwapper（ONNXRuntime），可自动选择 CPU/GPU。
+#
+# Usage:
+#   - Batch generation & logging for Deepfake/face-swap tasks.
+#   - Backend: InsightFace InSwapper (ONNXRuntime), auto-selects CPU/GPU.
+#
+# 快速使用（Quick Start）
+#   中文：
+#     1) 配置 data.task_csv 与 data.image_root 为你的数据路径（需含列：index, task_type, ori_image, target_image）；
+#     2) 按需设置 pipeline.backend=inswapper 与 backend_params.inswapper.model_path/provid ers；
+#     3) 运行：python code/deepfake/generate.py -c configs/deepfake.yaml
+#     4) 结果在 <output.dir>/<run.name>_<timestamp>；candidates.csv 记录路径与相似度（如启用 scoring）。
+#   English:
+#     1) Set data.task_csv and data.image_root (CSV must contain: index, task_type, ori_image, target_image);
+#     2) Configure pipeline.backend=inswapper and backend_params.inswapper.model_path/providers;
+#     3) Run: python code/deepfake/generate.py -c configs/deepfake.yaml
+#     4) Outputs under <output.dir>/<run.name>_<timestamp>; candidates.csv holds paths & similarity (if scoring enabled).
+# =========================================================
+
+run:
+  # Run name prefix; real folder will be <output.dir>/<name>_<timestamp>
+  name: deepfake_inswapper
+
+pipeline:
+  backend: inswapper           # only 'inswapper' for now; could be extended (e.g., "inswapper+esrgan")
+  dtype: fp32                  # onnx default; kept for format consistency
+  num_candidates: 1            # deterministic swap; keep 1
+  seeds: [0]                   # unified interface; not used by Deepfake
+
+output:
+  # Root output directory; each run creates a timestamped subdir
+  dir: /path/to/results/deepfake
+
+data:
+  # CSV must contain: index, task_type, ori_image, target_image
+  task_csv: /path/to/data/task_deepfake_sr.csv
+  filter_task_types: ["deepfake"]      # only process 'deepfake' rows
+  # If CSV paths are filenames/relative paths, set image_root:
+  image_root: /path/to/data/imgs_deepfake_sr
+  # Index range to process: left-closed, right-open [index_min, index_max)
+  index_min: 751
+  index_max: 1001
+
+backend_params:
+  inswapper:
+    # InsightFace FaceAnalysis preset
+    app_name: buffalo_l
+    # Detection resolution (lower=faster, higher=more robust)
+    det_size: [640, 640]
+    # InSwapper ONNX model directory (or explicit .onnx path). Keep your actual value outside this repo.
+    model_path: /home/<user>/.insightface/
+    # ONNX providers:
+    # - "auto" (commented example) would infer CUDA/CPU automatically
+    # - Or set list explicitly as below
+#   providers: auto
+    providers: ["CUDAExecutionProvider", "CPUExecutionProvider"]
+
+# (Optional / may be unused depending on your runner)
+# Keeping this block exactly as provided; some pipelines might read it.
+backend_params:
+  gfpgan:
+    model_path: /home/<user>/envs/GFPGAN/experiments/pretrained_models/GFPGANv1.4.pth
+    only_center_face: false
+    jpeg_quality: 100
+
+scoring:
+  # Record ArcFace similarity (cosine in [-1,1], typically [0,1]) into candidates.csv
+  enable: true
+  metric: arcface_cos
+  save_to_candidates: true
+
+logging:
+  save_candidates_csv: true    # write candidates.csv (index, paths, cos, etc.)
+  save_failures_csv: true      # write failures.csv (errors per item)
+
+preprocess:
+  face_sr:
+    enable: true
+    output_dir: /path/to/data/imgs_deepfake_sr
+    gfpgan:
+      model_path: /home/<user>/envs/GFPGAN/experiments/pretrained_models/GFPGANv1.4.pth
+      only_center_face: false
+      jpeg_quality: 95
+
+postprocess:
+  flux_edit:
+    enable: true
+
+    # --- Model & core params ---
+    model_path: /path/to/models/FLUX.1-Kontext-dev
+    steps: 32
+    guidance: 5.5
+    side: 1024
+    seed: 124
+    fill_rgb: [127, 127, 127]
+    skip_existing: true
+
+    # --- Prompts ---
+    prompt: >
+      remove unnatural seams around the face if any,
+      remove incomplete eyeglasses or artifacts around the eyes if any,
+      match surrounding lighting and skin tone; preserve identity, background, hair and clothing
+    negative_prompt: >
+      makeup, beauty filter, face reshape, sharpen, oversharpened,
+      plastic skin, waxy, color shift, background change, hairstyle change, text, watermark
+
+    # --- Inputs: prioritize run_dir/candidates.csv; if both missing, scan directory ---
+    input:
+      # 1) Recommended: previous run_dir (script will read its candidates.csv)
+      run_dir: /path/to/results/deepfake/deepfake_inswapper_<timestamp>
+      # 2) Or provide candidates.csv directly
+      # candidates_csv: /path/to/some/run/candidates.csv
+      # 3) Fallback: directory scan
+      # source_root: /path/to/deepfake/faceswap_result
+      filename_contains: "_inswapper"  # filter when scanning
+
+    # --- Output dir: default to <run_dir>/post_flux or <source_root>/post_flux if omitted ---
+    # out_dir: /path/to/results/deepfake/post_edit_flux
