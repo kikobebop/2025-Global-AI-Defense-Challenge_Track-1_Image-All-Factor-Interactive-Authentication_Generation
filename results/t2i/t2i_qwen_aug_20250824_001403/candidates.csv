@@ -1,0 +1,5 @@
+index,candidate_id,backend,image_path,seed_effective,width,height,steps,true_cfg,aspect_ratio,augmented
+1,0,qwen_image,,8,1664,928,50,4.0,16:9,1
+1,1,qwen_image,,24,1664,928,50,4.0,16:9,1
+2,0,qwen_image,,8,1664,928,50,4.0,16:9,1
+2,1,qwen_image,,24,1664,928,50,4.0,16:9,1

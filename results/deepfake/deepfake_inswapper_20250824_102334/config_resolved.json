@@ -1,0 +1,43 @@
+{
+  "argv": [
+    "code/deepfake/generate.py",
+    "--config",
+    "configs/deepfake.yaml"
+  ],
+  "time_start": "<timestamp>",
+  "config": {
+    "run": {
+      "name": "deepfake_inswapper",
+      "ts": "<timestamp>"
+    },
+    "data": {
+      "task_csv": "/***/data/task.csv",
+      "image_root": "/***/code_cleanup/data/imgs",
+      "index_min": 751,
+      "index_max": 1001,
+      "filter": [
+        "deepfake"
+      ]
+    },
+    "output": {
+      "dir": "/***/results/deepfake",
+      "run_dir": "/***/results/deepfake/deepfake_inswapper_<timestamp>"
+    },
+    "backend_params": {
+      "inswapper": {
+        "app_name": "buffalo_l",
+        "det_size": [
+          640,
+          640
+        ],
+        "model_path": "~/.insightface/",
+        "providers": "auto"
+      }
+    },
+    "scoring": {
+      "enable": true,
+      "metric": "arcface_cos",
+      "save_to_candidates": true
+    }
+  }
+}

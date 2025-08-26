@@ -1,0 +1,11 @@
+index,task_type,prompt,ori_image,result_dir,result_image,sc,pq,VIEScore,notes
+251,tie,把背景p成上海外滩,,,,9.0,8.0,8.4853,"背景成功替换为上海外滩，但人物与新背景的光影融合稍显不足（sc-1, pq-2）"
+252,tie,change the color of shirt to gray,,,,9.0,9.0,9.0,衣服颜色成功变为灰色，整体效果自然（无扣分）
+253,tie,Transform the image into a retro aesthetic.,,,,8.0,7.0,7.4833,"成功转换为复古风格，但部分细节略显模糊（sc-2, pq-3）"
+254,tie,Make the picture seem like it was taken outdoors at food festival,,,,8.0,7.0,7.4833,"背景成功转换为户外场景，但部分细节如人群和帐篷略显模糊（sc-2, pq-3）"
+255,tie,Remove the red outline from the skateboarder in the air.,,,,10.0,10.0,10.0,完全移除了滑板者的红色轮廓，保持了原图的其他元素和质量（无扣分）
+256,tie,Remove the cat from under the monitor.,,,,9.0,9.0,9.0,猫被成功移除，桌面细节保持一致（轻微扣分因背景光线变化）
+257,tie,Add a bottle of red wine behind the glass.,,,,9.0,9.0,9.0,添加红酒瓶符合指令，整体自然无明显瑕疵（-1，sc和pq各扣1）
+258,tie,"Change the pizza box to a plate of salad with lettuce and plum tomatos; change the man to a white female with long blond, straight hair.",,,,8.0,7.0,7.4833,"编辑基本符合要求，但人物的脸部细节和光影处理稍显不自然（sc-2, pq-3）"
+259,tie,Change the pizza into an apple pie.,,,,9.0,8.0,8.4853,"成功将披萨转换为苹果派，但饼皮边缘略显不自然（sc-1, pq-2）"
+260,tie,Take away the tallest tree from the image.,,,,9.0,9.0,9.0,成功移除最高树木，背景和前景保持一致（轻微扣分因可能有细微痕迹）

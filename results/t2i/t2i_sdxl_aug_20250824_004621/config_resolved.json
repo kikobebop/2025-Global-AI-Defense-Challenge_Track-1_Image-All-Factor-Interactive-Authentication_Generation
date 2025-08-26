@@ -1,0 +1,54 @@
+{
+  "argv": [
+    "code/t2i/generate.py",
+    "--config",
+    "configs/t2i.yaml"
+  ],
+  "time_start": "2025-08-24 00:46:21",
+  "config": {
+    "run": {
+      "name": "t2i_sdxl_aug",
+      "ts": "20250824_004621"
+    },
+    "data": {
+      "task_csv": "/***/data/task_en.csv",
+      "filter_task_types": [
+        "t2i"
+      ],
+      "index_max": 3
+    },
+    "output": {
+      "dir": "/***/results/t2i",
+      "run_dir": "/***/results/t2i/t2i_sdxl_aug_20250824_004621"
+    },
+    "pipeline": {
+      "backend": "sdxl",
+      "dtype": "bf16",
+      "num_candidates": 2,
+      "seeds": [
+        8,
+        24
+      ]
+    },
+    "backend_params": {
+      "sdxl": {
+        "model_path_base": "/***/models/SDXL-base-1.0",
+        "model_path_refiner": "/***/models/SDXL-refiner-1.0",
+        "use_refiner": true,
+        "aspect_ratio": "1024x1024",
+        "width": 1024,
+        "height": 1024,
+        "total_steps": 80,
+        "guidance_scale": 6.5,
+        "high_noise_frac": 0.76,
+        "augment": {
+          "enable": true,
+          "suffix_en": ", rich details, cinematic lighting and composition, natural color grading, realistic textures, balanced exposure, soft shadows, good micro-contrast",
+          "suffix_cn": "，细节丰富，电影感灯光及构图，色彩自然，真实材质，曝光均衡，柔和阴影，微对比增强",
+          "negative_en": "blurry, out of focus, low-res, jpeg artifacts, text, watermark, color banding, oversharpen, overexposed, underexposed, excessive noise, chromatic aberration, deformed face, wrongly-shaped eyes, asymmetrical face, waxy skin, bad anatomy, extra fingers, fused fingers, missing fingers, disfigured hands, extra limbs",
+          "negative_cn": "模糊，失焦，低清晰度，压缩伪影，文字水印，色带，过度锐化，过曝，欠曝，噪点过多，色散，面部畸形，眼部异常，面部不对称，蜡质皮肤，解剖错误，多手指，手指粘连，缺失手指，手部畸形，多余肢体"
+        }
+      }
+    }
+  }
+}

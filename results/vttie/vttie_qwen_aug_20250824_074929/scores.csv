@@ -1,0 +1,11 @@
+index,task_type,prompt,ori_image,result_dir,result_image,sc,pq,VIEScore,notes
+501,vttie,"Add the letter ""B"" to the baseball.",,,,9.0,9.0,9.0,字母B添加正确，球和手套细节清晰（轻微扣分：字母B可能稍显突兀）
+502,vttie,Add the word 'room' to the white wall to the right of the lamp.,,,,9.0,9.0,9.0,文字添加准确，位置和样式符合要求（-1，sc-1）
+503,vttie,Add the word 'bench' to the ground in front of the bench.,,,,5.0,9.0,6.7082,文字位置和样式与提示词不完全一致（sc-4）
+504,vttie,Add the letter A in pink frosting to the top of the cupcakes.,,,,9.0,9.0,9.0,编辑后图正确添加了粉色字母A，并保持了原图的主体和布局（sc扣1分，pq扣1分）
+505,vttie,Remove the word 'park' from the image.,,,,5.0,9.0,6.7082,文字'park'未完全移除，仍有部分残留（sc-5）
+506,vttie,"Add a sign that says ""Free Rides"" where the man in blue shirt in the front is holding. ",,,,8.0,9.0,8.4853,文字添加正确，但位置略显突兀（sc-2）
+507,vttie,Add the word 'grass' to the grass.,,,,4.0,8.0,5.6569,文字内容与提示词不一致（sc-4），但图像质量良好（pq-8）
+508,vttie,Add the word 'cat' in white above the cat.,,,,4.0,10.0,6.3246,文字内容与提示词不符，添加了额外的文字（sc-4）
+509,vttie,将文本 'CLASSIC MOJITO' 替换为 'BABY MILKSHAKE',,,,2.0,9.0,4.2426,文本替换错误，未找到 'CLASSIC MOJITO' 并替换成 'BABY MILKSHAKE' （sc-7）
+510,vttie,Replace the text 'duolingo' with 'greenowl',,,,9.0,9.0,9.0,文字替换准确，整体保持一致（无扣分）

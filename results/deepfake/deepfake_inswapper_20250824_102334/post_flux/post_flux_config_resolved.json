@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "code/deepfake/post_edit_flux.py",
+    "--config",
+    "configs/deepfake.yaml"
+  ],
+  "time_start": "2025-08-24 10:35:22",
+  "config": {
+    "model_path": "/***/models/FLUX.1-Kontext-dev",
+    "run_dir": "/***/results/deepfake/deepfake_inswapper_<timestamp>",
+    "candidates_csv": "/***/results/deepfake/deepfake_inswapper_<timestamp>/candidates.csv",
+    "source_root": "",
+    "filename_contains": "_inswapper",
+    "out_dir": "/***/results/deepfake/deepfake_inswapper_<timestamp>/post_flux",
+    "params": {
+      "steps": 32,
+      "guidance": 5.5,
+      "side": 1024,
+      "seed": 124,
+      "fill_rgb": [
+        127,
+        127,
+        127
+      ],
+      "skip_existing": true
+    }
+  }
+}

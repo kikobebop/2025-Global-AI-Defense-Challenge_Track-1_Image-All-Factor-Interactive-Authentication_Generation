@@ -1,0 +1,47 @@
+{
+  "argv": [
+    "code/t2i/generate.py",
+    "--config",
+    "configs/t2i.yaml"
+  ],
+  "time_start": "2025-08-24 00:21:06",
+  "config": {
+    "run": {
+      "name": "t2i_sdxl_baseline",
+      "ts": "20250824_002106"
+    },
+    "data": {
+      "task_csv": "/***/data/task_en.csv",
+      "filter_task_types": [
+        "t2i"
+      ],
+      "index_max": 3
+    },
+    "output": {
+      "dir": "/***/results/t2i",
+      "run_dir": "/***/results/t2i/t2i_sdxl_baseline_20250824_002106"
+    },
+    "pipeline": {
+      "backend": "sdxl",
+      "dtype": "bf16",
+      "num_candidates": 1,
+      "seeds": [
+        0
+      ]
+    },
+    "backend_params": {
+      "sdxl": {
+        "model_path_base": "/***/models/SDXL-base-1.0",
+        "model_path_refiner": "/***/models/SDXL-refiner-1.0",
+        "use_refiner": true,
+        "aspect_ratio": "1024x1024",
+        "width": 1024,
+        "height": 1024,
+        "total_steps": 80,
+        "guidance_scale": 6.5,
+        "high_noise_frac": 0.76,
+        "augment": null
+      }
+    }
+  }
+}

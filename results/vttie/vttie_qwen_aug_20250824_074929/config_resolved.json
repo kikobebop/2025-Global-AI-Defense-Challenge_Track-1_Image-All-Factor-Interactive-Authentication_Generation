@@ -1,0 +1,46 @@
+{
+  "argv": [
+    "code/vttie/generate.py",
+    "--config",
+    "configs/vttie.yaml"
+  ],
+  "time_start": "2025-08-24 07:49:29",
+  "config": {
+    "run": {
+      "name": "vttie_qwen_aug",
+      "ts": "20250824_074929"
+    },
+    "data": {
+      "task_csv": "/***/code_cleanup/data/task.csv",
+      "img_root": "/***/code_cleanup/data/imgs",
+      "filter_task_types": [
+        "vttie"
+      ],
+      "index_max": 511
+    },
+    "output": {
+      "dir": "/***/code_cleanup/results/vttie",
+      "run_dir": "/***/code_cleanup/results/vttie/vttie_qwen_aug_20250824_074929"
+    },
+    "pipeline": {
+      "backend": "qwen_edit",
+      "dtype": "bf16",
+      "num_candidates": 1,
+      "seeds": [
+        24
+      ]
+    },
+    "backend_params": {
+      "qwen_edit": {
+        "model_path": "/***/models/Qwen-Image-Edit",
+        "steps": 50,
+        "true_cfg": 4.0,
+        "negative_prompt": "",
+        "augment": {
+          "enable": true,
+          "negative_common": "do not change background; do not change people; do not change objects; no global restyle; no color shift; no relighting; no smoothing; do not modify any other text; keep original layout; keep font; keep stroke; keep size; no deformation; no warping; no overpainting; no artifacts\n"
+        }
+      }
+    }
+  }
+}

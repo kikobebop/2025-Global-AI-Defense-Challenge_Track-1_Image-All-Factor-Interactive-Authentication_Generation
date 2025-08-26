@@ -1,0 +1,59 @@
+{
+  "argv": [
+    "code/vttie/generate.py",
+    "--config",
+    "configs/vttie.yaml"
+  ],
+  "time_start": "2025-08-24 07:03:31",
+  "config": {
+    "run": {
+      "name": "vttie_flux_baseline",
+      "ts": "20250824_070330"
+    },
+    "data": {
+      "task_csv": "/***/code_cleanup/data/task_en.csv",
+      "img_root": "/***/code_cleanup/data/imgs",
+      "filter_task_types": [
+        "vttie"
+      ],
+      "index_max": 511
+    },
+    "output": {
+      "dir": "/***/code_cleanup/results/vttie",
+      "run_dir": "/***/code_cleanup/results/vttie/vttie_flux_baseline_20250824_070330"
+    },
+    "pipeline": {
+      "backend": "flux_edit",
+      "dtype": "bf16",
+      "num_candidates": 1,
+      "seeds": [
+        0
+      ]
+    },
+    "backend_params": {
+      "flux_edit": {
+        "model_path": "/***/models/FLUX.1-Kontext-dev",
+        "steps": 28,
+        "guidance_scale": 3.2,
+        "augment": {
+          "enable": false,
+          "mode": "strict",
+          "presets": {
+            "lite": {
+              "suffix_en": ", keep unchanged areas intact, preserve composition and subject identity, seamless edit, consistent lighting and color, clean edges",
+              "negative_en": "artifacts, seams, ghosting, distortion, blur, low-res, text, watermark, color shift, over-smoothing, over-sharpening"
+            },
+            "balanced": {
+              "suffix_en": "preserve composition and subject identity, match the overall image style, seamless integration, consistent lighting and color balance, realistic shadows, clean edges",
+              "negative_en": "blurry, low-res, artifacts, text, watermark, editing seams, ghosting, warped shapes, mismatched perspective, color shift, over-smoothing, over-sharpening"
+            },
+            "strict": {
+              "suffix_en": ", strictly preserve overall composition and subject identity, keep all other regions unchanged, match the overall image style, no layout drift, match perspective and scale, consistent lighting and color, seamless boundaries",
+              "negative_en": "blurry, low-res, jpeg artifacts, text, watermark, editing seams, ghosting, duplicated or floating objects, warped shapes, mismatched perspective, color shift, chromatic aberration, over-smoothing, over-sharpening"
+            }
+          }
+        }
+      }
+    }
+  }
+}

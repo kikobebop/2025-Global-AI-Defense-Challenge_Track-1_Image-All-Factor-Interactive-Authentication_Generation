@@ -1,0 +1,46 @@
+{
+  "argv": [
+    "code/tie/generate.py",
+    "--config",
+    "configs/tie.yaml"
+  ],
+  "time_start": "2025-08-24 06:33:25",
+  "config": {
+    "run": {
+      "name": "tie_qwen_aug",
+      "ts": "20250824_063325"
+    },
+    "data": {
+      "task_csv": "/***/code_cleanup/data/task.csv",
+      "filter_task_types": [
+        "tie"
+      ],
+      "index_max": 261
+    },
+    "output": {
+      "dir": "/***/code_cleanup/results/tie",
+      "run_dir": "/***/code_cleanup/results/tie/tie_qwen_aug_20250824_063325"
+    },
+    "pipeline": {
+      "backend": "qwen_edit",
+      "dtype": "bf16",
+      "num_candidates": 1,
+      "seeds": [
+        824
+      ]
+    },
+    "backend_params": {
+      "qwen_edit": {
+        "model_path": "/***/models/Qwen-Image-Edit",
+        "steps": 50,
+        "true_cfg": 4.0,
+        "negative_prompt": "",
+        "augment": {
+          "enable": true,
+          "prefix_cn": "请严格依据以下指令进行图像编辑：在不影响无关区域的前提下，只对与指令相关的元素进行必要的修改；保持主体、背景、构图与色调稳定，不进行不必要的全局风格变化；新增/删除内容仅在指令明确要求时执行；人像编辑需保持五官结构自然，避免过度磨皮与失真；文本（如有）非编辑目标时保持清晰不变；若指令明确要求整体风格迁移或大幅重绘，则以该要求为准。",
+          "negative_cn": "avoid unnecessary global restyle; no unintended color shift; no relighting; do not modify unrelated regions; do not add or remove unrelated objects; no warping; no distortion; keep composition and background stable; no plastic/waxy skin; avoid over-smoothing; preserve non-target text integrity"
+        }
+      }
+    }
+  }
+}

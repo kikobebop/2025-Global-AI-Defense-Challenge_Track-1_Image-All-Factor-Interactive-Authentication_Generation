@@ -1,0 +1,5 @@
+index,candidate_id,backend,image_path,seed_effective,width,height,total_steps,guidance_scale,high_noise_frac,use_refiner,aspect_ratio,augmented
+1,00,sdxl,,8,1024,1024,80,6.5,0.76,True,1024x1024,1
+1,01,sdxl,,24,1024,1024,80,6.5,0.76,True,1024x1024,1
+2,00,sdxl,,8,1024,1024,80,6.5,0.76,True,1024x1024,1
+2,01,sdxl,,24,1024,1024,80,6.5,0.76,True,1024x1024,1

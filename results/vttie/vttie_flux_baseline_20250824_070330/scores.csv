@@ -1,0 +1,11 @@
+index,task_type,prompt,ori_image,result_dir,result_image,sc,pq,VIEScore,notes
+501,vttie,"Add the letter ""B"" to the baseball.",,,,9.0,9.0,9.0,字母B添加正确，位置和样式符合要求（-1，-1）
+502,vttie,Add the word 'room' to the white wall to the right of the lamp.,,,,9.0,9.0,9.0,文字添加准确，位置和样式符合要求（-1，sc-1，pq-1）
+503,vttie,Add the word 'bench' to the ground in front of the bench.,,,,4.0,9.0,6.0,文字拼写错误（sc-5）
+504,vttie,Add the letter A in pink frosting to the top of the cupcakes.,,,,9.0,9.0,9.0,编辑语义一致，粉色字母A添加准确，质量高（无扣分）
+505,vttie,Remove the word 'park' from the image.,,,,8.0,9.0,8.4853,成功移除了'park'字样，但背景有轻微残留痕迹（sc-2）
+506,vttie,"Add a sign that says ""Free Rides"" where the man in blue shirt in the front is holding. ",,,,8.0,9.0,8.4853,文字内容和位置符合要求，但字体样式稍显突兀（sc-2）
+507,vttie,Add the word 'grass' to the grass.,,,,8.0,7.0,7.4833,"文字添加正确但与背景融合度一般（sc-2, pq-3）"
+508,vttie,Add the word 'cat' in white above the cat.,,,,9.0,9.0,9.0,文字添加正确且位置合适（无扣分）
+509,vttie,将文本 'CLASSIC MOJITO' 替换为 'BABY MILKSHAKE',,,,4.0,10.0,6.3246,替换后的文本内容错误（sc-5）
+510,vttie,Replace the text 'duolingo' with 'greenowl',,,,9.0,10.0,9.4868,文字替换准确无误，字体和颜色保持一致（-1）

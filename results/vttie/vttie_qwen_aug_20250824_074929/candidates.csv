@@ -1,0 +1,11 @@
+index,candidate_id,backend,image_path,src_image,seed_effective,steps,true_cfg,augmented
+501,0,qwen_edit,,,24,50,4.0,1
+502,0,qwen_edit,,,24,50,4.0,1
+503,0,qwen_edit,,,24,50,4.0,1
+504,0,qwen_edit,,,24,50,4.0,1
+505,0,qwen_edit,,,24,50,4.0,1
+506,0,qwen_edit,,,24,50,4.0,1
+507,0,qwen_edit,,,24,50,4.0,1
+508,0,qwen_edit,,,24,50,4.0,1
+509,0,qwen_edit,,,24,50,4.0,1
+510,0,qwen_edit,,,24,50,4.0,1

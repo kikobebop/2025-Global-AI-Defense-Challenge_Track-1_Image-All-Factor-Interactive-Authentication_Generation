@@ -1,0 +1,3 @@
+index,task_type,prompt,result_image,sc,pq,VIEScore,notes
+1,t2i,A stunning tree grows from an asteroid in space with intricate details and natural lighting for a surreal 3D rendering.,,8.0,9.0,8.4853,树和行星的细节丰富，光线自然，但场景略显超现实而非完全写实。
+2,t2i,Calm and fluffy clouds in a serene sky painted in conceptual art style in 4K resolution.,,8.0,9.0,8.4853,云朵形态和天空氛围符合提示，但风格略显写实而非概念艺术。
