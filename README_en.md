@@ -11,7 +11,7 @@ The generation track comprises four tasks, all centered on producing high‑qual
 
 My goal was to build a pipeline using only **open‑source** models covering generation, editing, as well as evaluation, then use the competition as a validation of the overall pipeline.
 
-For detailed methodology, ablations, and reproducibility notes, see the reports in the [docs](./docs) directory.
+For detailed methodology, ablations, and reproducibility notes, see the code below and reports in the [docs](./docs) directory.
 
 ## Repo Structure
 ```text
